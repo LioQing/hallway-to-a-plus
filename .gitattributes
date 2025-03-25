@@ -1,0 +1,4 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+[Aa]ssets/[Gg]aussian[Aa]ssets/** filter=lfs diff=lfs merge=lfs -text
+[Aa]ssets/[Gg]aussian[Mm]odels/** filter=lfs diff=lfs merge=lfs -text
