@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GaussianSplatting.Runtime;
 using UnityEngine;
@@ -6,11 +7,20 @@ using UnityEngine.Events;
 public class HideTrigger : MonoBehaviour
 {
     public bool isHidden;
+    public bool handleRenderMode = true;
     public GaussianSplatRenderer[] splatRenderers;
     public HideTrigger[] compositeTriggers;
     public UnityEvent onUpdate;
     public UnityEvent onEnter;
     public UnityEvent onExit;
+
+    private void Start()
+    {
+        foreach (var trigger in compositeTriggers)
+        {
+            trigger.handleRenderMode = false;
+        }
+    }
 
     public void OnCompositeTriggerUpdate()
     {
@@ -24,9 +34,12 @@ public class HideTrigger : MonoBehaviour
         {
             case true when !isHidden:
             {
-                foreach (var splatRenderer in splatRenderers)
+                if (handleRenderMode)
                 {
-                    splatRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Hidden;
+                    foreach (var splatRenderer in splatRenderers)
+                    {
+                        splatRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Hidden;
+                    }
                 }
             
                 isHidden = true;
@@ -36,11 +49,14 @@ public class HideTrigger : MonoBehaviour
             }
             case false when isHidden:
             {
-                foreach (var splatRenderer in splatRenderers)
+                if (handleRenderMode)
                 {
-                    splatRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Splats;
+                    foreach (var splatRenderer in splatRenderers)
+                    {
+                        splatRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Splats;
+                    }
                 }
-            
+
                 isHidden = false;
                 onUpdate.Invoke();
                 onExit.Invoke();
@@ -55,12 +71,15 @@ public class HideTrigger : MonoBehaviour
         {
             return;
         }
-        
-        foreach (var splatRenderer in splatRenderers)
+
+        if (handleRenderMode)
         {
-            splatRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Hidden;
+            foreach (var splatRenderer in splatRenderers)
+            {
+                splatRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Hidden;
+            }
         }
-        
+
         isHidden = true;
         onUpdate.Invoke();
         onEnter.Invoke();
@@ -72,12 +91,15 @@ public class HideTrigger : MonoBehaviour
         {
             return;
         }
-        
-        foreach (var splatRenderer in splatRenderers)
+
+        if (handleRenderMode)
         {
-            splatRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Splats;
+            foreach (var splatRenderer in splatRenderers)
+            {
+                splatRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Splats;
+            }
         }
-        
+
         isHidden = false;
         onUpdate.Invoke();
         onExit.Invoke();

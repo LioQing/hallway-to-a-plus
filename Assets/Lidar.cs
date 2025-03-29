@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GaussianSplatting.Runtime;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -11,17 +13,23 @@ public class Lidar : MonoBehaviour
     public Camera lidarCamera;
     public PointCloud pointCloud;
     public GameObject gaussianSplatsScene;
+    public GameObject hideTriggers;
     public InputActionReference captureAction;
 
     [Range(0f, 1f)] public float lineWidth = 0.01f;
     [Range(0f, 1f)] public float captureRadius = 0.1f;
     [Range(0f, 1f)] public float captureInterval = 0.1f;
     public int maxPoints = 10000;
+    public LayerMask captureLayerMask;
 
     private int _currentPointIndex;
     private float _captureTimer;
     private LineRenderer _lineRenderer;
-    private GaussianSplatRenderer[] _gaussianSplatRenderers;
+    [CanBeNull] private ItemFollow _itemFollow;
+
+    private (GaussianSplatRenderer, HideTrigger)[] _splats;
+
+    private IEnumerable<GaussianSplatRenderer> SplatRenderers => _splats?.Select(s => s.Item1);
 
     private void OnEnable()
     {
@@ -43,17 +51,36 @@ public class Lidar : MonoBehaviour
         _lineRenderer.startWidth = lineWidth;
         _lineRenderer.endWidth = lineWidth;
         
-        _gaussianSplatRenderers = gaussianSplatsScene.GetComponentsInChildren<GaussianSplatRenderer>(true);
-        foreach (var gsRenderer in _gaussianSplatRenderers)
+        var splatRenderers = gaussianSplatsScene.GetComponentsInChildren<GaussianSplatRenderer>(true);
+        
+        _splats = splatRenderers.Select(splatRenderer =>
+        {
+            var hideTrigger = hideTriggers.transform.Find(splatRenderer.name).GetComponent<HideTrigger>();
+            
+            return (splatRenderer, hideTrigger);
+        }).ToArray();
+        
+        foreach (var gsRenderer in SplatRenderers)
         {
             gsRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Hidden;
         }
 
         pointCloud.CreatePoint(maxPoints);
+        
+        _itemFollow = GetComponent<ItemFollow>();
+        if (_itemFollow != null)
+        {
+            _itemFollow.shouldUpdate = false;
+        }
     }
 
     private void LateUpdate()
     {
+        if (_itemFollow != null)
+        {
+            _itemFollow.OnUpdateRequest();
+        }
+        
         Capture();
         
         pointCloud.RenderPoints();
@@ -131,7 +158,7 @@ public class Lidar : MonoBehaviour
         _lineRenderer.enabled = false;
         pointCloud.enabled = false;
 
-        foreach (var gsRenderer in _gaussianSplatRenderers)
+        foreach (var gsRenderer in SplatRenderers)
         {
             gsRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Splats;
         }
@@ -156,7 +183,7 @@ public class Lidar : MonoBehaviour
         _lineRenderer.enabled = true;
         pointCloud.enabled = true;
 
-        foreach (var gsRenderer in _gaussianSplatRenderers)
+        foreach (var gsRenderer in SplatRenderers)
         {
             gsRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Hidden;
         }
@@ -177,7 +204,7 @@ public class Lidar : MonoBehaviour
             var viewportPoint = pixels[i] / cameraSize;
             var ray = lidarCamera.ViewportPointToRay(viewportPoint);
 
-            if (Physics.Raycast(ray, out var hit))
+            if (Physics.Raycast(ray, out var hit, 50f, captureLayerMask))
             {
                 positions[i] = hit.point;
             }

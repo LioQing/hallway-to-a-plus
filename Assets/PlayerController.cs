@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController _controller;
     private Vector2 _moveInput;
     private bool _jumpInput;
-    [SerializeField] private bool _isRunning;
+    private bool _isRunning;
     private float _verticalRotation;
     private float _verticalVelocity;
 
