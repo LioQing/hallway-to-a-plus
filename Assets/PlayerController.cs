@@ -4,14 +4,16 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f;
-    public float lookSensitivity = 0.2f;
-    public float jumpHeight = 1f;
+    public float walkSpeed = 1.5f;
+    public float runSpeed = 3f;
+    public float lookSensitivity = 0.15f;
+    public float jumpHeight = 0.4f;
     public float gravity = -9.81f;
 
     private CharacterController _controller;
     private Vector2 _moveInput;
     private bool _jumpInput;
+    [SerializeField] private bool _isRunning;
     private float _verticalRotation;
     private float _verticalVelocity;
 
@@ -39,7 +41,8 @@ public class PlayerController : MonoBehaviour
         _verticalVelocity += gravity * Time.deltaTime;
 
         var moveDelta = new Vector3(_moveInput.x, 0f, _moveInput.y);
-        var move = transform.TransformDirection(moveDelta) * moveSpeed;
+        var currentSpeed = _isRunning ? runSpeed : walkSpeed;
+        var move = transform.TransformDirection(moveDelta) * currentSpeed;
         
         move.y = _verticalVelocity;
         
@@ -72,5 +75,10 @@ public class PlayerController : MonoBehaviour
     public void OnJump(InputAction.CallbackContext ctx)
     {
         _jumpInput = ctx.ReadValueAsButton();
+    }
+
+    public void OnSprint(InputAction.CallbackContext ctx)
+    {
+        _isRunning = ctx.ReadValueAsButton();
     }
 }

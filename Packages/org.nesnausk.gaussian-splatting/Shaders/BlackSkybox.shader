@@ -3,7 +3,7 @@ Shader "Unlit/BlackSkybox"
 {
     Properties
     {
-        _Color ("Color", Color) = (0,0,0,0)
+        _Color ("Color", Color) = (0.90,0.85,0.72,0)
     }
     SubShader
     {
