@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GaussianSplatting.Runtime;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class AnomalyManager : MonoBehaviour
 {
@@ -32,9 +33,14 @@ public class AnomalyManager : MonoBehaviour
     public Lidar lidar;
     public PointCloud lidarPointCloud;
 
-    private (GaussianSplatRenderer, HideTrigger)[] _splats;
+    [Header("Gaussian Anomaly")]
+    public GaussianSplatAsset[] leftGaussianAnomalies;
+    public GaussianSplatAsset[] rightGaussianAnomalies;
 
+    private (GaussianSplatRenderer, HideTrigger)[] _splats;
     private IEnumerable<GaussianSplatRenderer> SplatRenderers => _splats?.Select(s => s.Item1);
+    private GaussianSplatRenderer _left;
+    private GaussianSplatRenderer _right;
 
     private void Start()
     {
@@ -46,8 +52,19 @@ public class AnomalyManager : MonoBehaviour
             
             return (splatRenderer, hideTrigger);
         }).ToArray();
+
+        _left = _splats.Where(s => s.Item1.gameObject.name == "Left").Select(s => s.Item1).First();
+        _right = _splats.Where(s => s.Item1.gameObject.name == "Right").Select(s => s.Item1).First();
+        
+        if (_left == null || _right == null)
+        {
+            Debug.LogError("Left or Right Gaussian Splat Renderer not found.");
+            return;
+        }
         
         SetEnvironment(environment);
+        
+        GenerateGaussianAnomaly(true);
     }
 
     public void SetEnvironment(Environment newEnv)
@@ -144,5 +161,15 @@ public class AnomalyManager : MonoBehaviour
             splatRenderer.m_CSSplatUtilities = normalSplatUtilities;
             hideTrigger.handleRenderMode = true;
         }
+    }
+
+    private void GenerateGaussianAnomaly(bool isLeft)
+    {
+        var anomalies = isLeft ? leftGaussianAnomalies : rightGaussianAnomalies;
+        var splatRenderer = isLeft ? _left : _right;
+
+        var randomAnomaly = anomalies[Random.Range(0, anomalies.Length)];
+
+        splatRenderer.m_Asset = randomAnomaly;
     }
 }
