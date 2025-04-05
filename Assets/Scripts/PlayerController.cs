@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour
     
     public void OnLook(InputAction.CallbackContext ctx)
     {
-        if (Cursor.lockState != CursorLockMode.Locked)
+        if (Cursor.visible || Cursor.lockState != CursorLockMode.Locked)
         {
             return;
         }

@@ -14,6 +14,7 @@ public class Lidar : MonoBehaviour
     public PointCloud pointCloud;
     public GameObject gaussianSplatsScene;
     public GameObject hideTriggers;
+    public List<Renderer> extraCaptureRenderers = new();
     public InputActionReference captureAction;
 
     [Range(0f, 1f)] public float lineWidth = 0.01f;
@@ -158,9 +159,19 @@ public class Lidar : MonoBehaviour
         _lineRenderer.enabled = false;
         pointCloud.enabled = false;
 
-        foreach (var gsRenderer in SplatRenderers)
+        foreach (var (gsRenderer, hideTrigger) in _splats)
         {
+            if (hideTrigger.isHidden)
+            {
+                continue;
+            }
+            
             gsRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Splats;
+        }
+        
+        foreach (var extraCaptureRenderer in extraCaptureRenderers)
+        {
+            extraCaptureRenderer.enabled = true;
         }
 
         var captureTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
@@ -186,6 +197,11 @@ public class Lidar : MonoBehaviour
         foreach (var gsRenderer in SplatRenderers)
         {
             gsRenderer.m_RenderMode = GaussianSplatRenderer.RenderMode.Hidden;
+        }
+        
+        foreach (var extraCaptureRenderer in extraCaptureRenderers)
+        {
+            extraCaptureRenderer.enabled = false;
         }
 
         Destroy(rt);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GaussianSplatting.Runtime;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -30,12 +31,29 @@ public class AnomalyManager : MonoBehaviour
     public GameObject torch;
 
     [Header("Lidar")]
-    public Lidar lidar;
+    public GameObject lidar;
     public PointCloud lidarPointCloud;
 
     [Header("Gaussian Anomaly")]
     public GaussianSplatAsset[] leftGaussianAnomalies;
     public GaussianSplatAsset[] rightGaussianAnomalies;
+
+    [Header("Mannequin")]
+    public GameObject leftMannequin;
+    public GameObject rightMannequin;
+    public Material mannequinDistanceFadeMaterial;
+
+    [Header("Wall Escape")]
+    public GaussianSplatAsset leftWallEscapeGaussian;
+    public GaussianSplatAsset rightWallEscapeGaussian;
+    public GameObject leftWallEscapeWalls;
+    public GameObject rightWallEscapeWalls;
+    public GameObject leftWallOriginalWall;
+    public GameObject rightWallOriginalWall;
+    
+    [Header("Leave Triggers")]
+    public LeaveTrigger leftLeaveTrigger;
+    public LeaveTrigger rightLeaveTrigger;
 
     private (GaussianSplatRenderer, HideTrigger)[] _splats;
     private IEnumerable<GaussianSplatRenderer> SplatRenderers => _splats?.Select(s => s.Item1);
@@ -63,8 +81,6 @@ public class AnomalyManager : MonoBehaviour
         }
         
         SetEnvironment(environment);
-        
-        GenerateGaussianAnomaly(true);
     }
 
     public void SetEnvironment(Environment newEnv)
@@ -116,7 +132,7 @@ public class AnomalyManager : MonoBehaviour
             }
             case Environment.Lidar:
             {
-                lidar.gameObject.SetActive(true);
+                lidar.SetActive(true);
                 lidarPointCloud.gameObject.SetActive(true);
 
                 var cam = Camera.main;
@@ -145,7 +161,7 @@ public class AnomalyManager : MonoBehaviour
     {
         distanceCutout.gameObject.SetActive(false);
         torch.SetActive(false);
-        lidar.gameObject.SetActive(false);
+        lidar.SetActive(false);
         lidarPointCloud.gameObject.SetActive(false);
 
         var cam = Camera.main;
@@ -162,14 +178,51 @@ public class AnomalyManager : MonoBehaviour
             hideTrigger.handleRenderMode = true;
         }
     }
-
-    private void GenerateGaussianAnomaly(bool isLeft)
+    
+    private void CreateGaussianAnomaly(bool isLeft, int index)
     {
         var anomalies = isLeft ? leftGaussianAnomalies : rightGaussianAnomalies;
         var splatRenderer = isLeft ? _left : _right;
 
-        var randomAnomaly = anomalies[Random.Range(0, anomalies.Length)];
+        var randomAnomaly = anomalies[index];
 
         splatRenderer.m_Asset = randomAnomaly;
+    }
+
+    private void CreateMannequin(bool isLeft)
+    {
+        var mannequin = isLeft ? leftMannequin : rightMannequin;
+        var instantiated = Instantiate(mannequin);
+
+        if (environment == Environment.Lidar)
+        {
+            var renderers = instantiated.transform.Find("Mannequin").GetComponentsInChildren<Renderer>();
+            lidar.GetComponentInChildren<Lidar>().extraCaptureRenderers.AddRange(renderers);
+
+            foreach (var mannequinRenderer in renderers)
+            {
+                mannequinRenderer.enabled = false;
+            }
+        } else if (environment == Environment.DistanceFade)
+        {
+            var renderers = instantiated.transform.Find("Mannequin").GetComponentsInChildren<Renderer>();
+            
+            foreach (var mannequinRenderer in renderers)
+            {
+                mannequinRenderer.material = mannequinDistanceFadeMaterial;
+            }
+        }
+    }
+
+    private void CreateWallEscape(bool isLeft)
+    {
+        var gaussian = isLeft ? leftWallEscapeGaussian : rightWallEscapeGaussian;
+        var walls = isLeft ? leftWallEscapeWalls : rightWallEscapeWalls;
+        var originalWall = isLeft ? leftWallOriginalWall : rightWallOriginalWall;
+        var splatRenderer = isLeft ? _left : _right;
+        
+        originalWall.gameObject.SetActive(false);
+        splatRenderer.m_Asset = gaussian;
+        Instantiate(walls);
     }
 }
