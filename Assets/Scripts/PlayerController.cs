@@ -20,9 +20,6 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         _controller = GetComponent<CharacterController>();
-        
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     private void Update()
@@ -56,7 +53,7 @@ public class PlayerController : MonoBehaviour
     
     public void OnLook(InputAction.CallbackContext ctx)
     {
-        if (Cursor.visible || Cursor.lockState != CursorLockMode.Locked)
+        if (Cursor.visible || Cursor.lockState != CursorLockMode.Locked || PauseMenu.Paused)
         {
             return;
         }

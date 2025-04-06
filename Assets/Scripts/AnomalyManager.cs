@@ -15,10 +15,37 @@ public class AnomalyManager : MonoBehaviour
         Torch,
         Lidar
     }
+
+    public enum AnomalyType
+    {
+        // Gaussian Anomalies
+        LeftF,
+        LeftGreenGraphic,
+        LeftRedGraphic,
+        LeftRedDoor1,
+        LeftRedDoor2,
+        LeftShuffleInfographics,
+        RightF,
+        RightFlipGenderColor,
+        RightRedDoor1,
+        RightRedDoor2,
+        RightRedDoor3,
+        RightShuffleHouses,
+        
+        // Mannequin
+        LeftMannequin,
+        RightMannequin,
+        
+        // Wall Escape
+        LeftWallEscape,
+        RightWallEscape,
+    }
     
     public GameObject gaussianSplatsScene;
     public GameObject hideTriggers;
     public Environment environment = Environment.Normal;
+    public AnomalyType? Anomaly;
+    public bool initializeFromSettings = true;
     
     [Header("Normal")]
     public ComputeShader normalSplatUtilities;
@@ -80,10 +107,18 @@ public class AnomalyManager : MonoBehaviour
             return;
         }
         
+        if (initializeFromSettings)
+        {
+            environment = AnomalySettings.Environment;
+            Anomaly = AnomalySettings.Anomaly;
+        }
+        
         SetEnvironment(environment);
+        SetAnomaly();
+        SetLeaveTriggers();
     }
 
-    public void SetEnvironment(Environment newEnv)
+    private void SetEnvironment(Environment newEnv)
     {
         environment = newEnv;
         
@@ -178,9 +213,49 @@ public class AnomalyManager : MonoBehaviour
             hideTrigger.handleRenderMode = true;
         }
     }
-    
-    private void CreateGaussianAnomaly(bool isLeft, int index)
+
+    private void SetAnomaly()
     {
+        switch (Anomaly)
+        {
+            case AnomalyType.LeftF:
+            case AnomalyType.LeftGreenGraphic:
+            case AnomalyType.LeftRedGraphic:
+            case AnomalyType.LeftRedDoor1:
+            case AnomalyType.LeftRedDoor2:
+            case AnomalyType.LeftShuffleInfographics:
+                CreateGaussianAnomaly((int) Anomaly);
+                break;
+            case AnomalyType.RightF:
+            case AnomalyType.RightFlipGenderColor:
+            case AnomalyType.RightRedDoor1:
+            case AnomalyType.RightRedDoor2:
+            case AnomalyType.RightRedDoor3:
+            case AnomalyType.RightShuffleHouses:
+                CreateGaussianAnomaly((int) Anomaly - (int) AnomalyType.RightF);
+                break;
+            case AnomalyType.LeftMannequin:
+                CreateMannequin();
+                break;
+            case AnomalyType.RightMannequin:
+                CreateMannequin();
+                break;
+            case AnomalyType.LeftWallEscape:
+                CreateWallEscape();
+                break;
+            case AnomalyType.RightWallEscape:
+                CreateWallEscape();
+                break;
+            case null:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
+    private void CreateGaussianAnomaly(int index)
+    {
+        var isLeft = IsLeftAnomaly();
         var anomalies = isLeft ? leftGaussianAnomalies : rightGaussianAnomalies;
         var splatRenderer = isLeft ? _left : _right;
 
@@ -189,33 +264,49 @@ public class AnomalyManager : MonoBehaviour
         splatRenderer.m_Asset = randomAnomaly;
     }
 
-    private void CreateMannequin(bool isLeft)
+    private void CreateMannequin()
     {
+        var isLeft = IsLeftAnomaly();
         var mannequin = isLeft ? leftMannequin : rightMannequin;
         var instantiated = Instantiate(mannequin);
 
-        if (environment == Environment.Lidar)
+        switch (environment)
         {
-            var renderers = instantiated.transform.Find("Mannequin").GetComponentsInChildren<Renderer>();
-            lidar.GetComponentInChildren<Lidar>().extraCaptureRenderers.AddRange(renderers);
+            case Environment.Lidar:
+            {
+                var renderers = instantiated.transform.Find("Mannequin").GetComponentsInChildren<Renderer>();
+                lidar.GetComponentInChildren<Lidar>().extraCaptureRenderers.AddRange(renderers);
 
-            foreach (var mannequinRenderer in renderers)
-            {
-                mannequinRenderer.enabled = false;
+                foreach (var mannequinRenderer in renderers)
+                {
+                    mannequinRenderer.enabled = false;
+                }
+
+                break;
             }
-        } else if (environment == Environment.DistanceFade)
-        {
-            var renderers = instantiated.transform.Find("Mannequin").GetComponentsInChildren<Renderer>();
+            case Environment.DistanceFade:
+            {
+                var renderers = instantiated.transform.Find("Mannequin").GetComponentsInChildren<Renderer>();
             
-            foreach (var mannequinRenderer in renderers)
-            {
-                mannequinRenderer.material = mannequinDistanceFadeMaterial;
+                foreach (var mannequinRenderer in renderers)
+                {
+                    mannequinRenderer.material = mannequinDistanceFadeMaterial;
+                }
+
+                break;
             }
+            case Environment.Normal:
+                break;
+            case Environment.Torch:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
-    private void CreateWallEscape(bool isLeft)
+    private void CreateWallEscape()
     {
+        var isLeft = IsLeftAnomaly();
         var gaussian = isLeft ? leftWallEscapeGaussian : rightWallEscapeGaussian;
         var walls = isLeft ? leftWallEscapeWalls : rightWallEscapeWalls;
         var originalWall = isLeft ? leftWallOriginalWall : rightWallOriginalWall;
@@ -224,5 +315,28 @@ public class AnomalyManager : MonoBehaviour
         originalWall.gameObject.SetActive(false);
         splatRenderer.m_Asset = gaussian;
         Instantiate(walls);
+    }
+
+    private void SetLeaveTriggers()
+    {
+        var isLeft = IsLeftAnomaly();
+        leftLeaveTrigger.isCorrect = !isLeft;
+        rightLeaveTrigger.isCorrect = isLeft;
+    }
+
+    private bool IsLeftAnomaly()
+    {
+        return Anomaly switch
+        {
+            AnomalyType.LeftF => true,
+            AnomalyType.LeftGreenGraphic => true,
+            AnomalyType.LeftRedGraphic => true,
+            AnomalyType.LeftRedDoor1 => true,
+            AnomalyType.LeftRedDoor2 => true,
+            AnomalyType.LeftShuffleInfographics => true,
+            AnomalyType.LeftMannequin => true,
+            AnomalyType.LeftWallEscape => true,
+            _ => false
+        };
     }
 }

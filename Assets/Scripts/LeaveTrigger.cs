@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class LeaveTrigger : MonoBehaviour
 {
@@ -23,7 +24,23 @@ public class LeaveTrigger : MonoBehaviour
             return;
         }
 
-        Debug.Log(isCorrect ? "Correct" : "Incorrect");
+        if (isCorrect)
+        {
+            AnomalySettings.NextEnvironment(); // Environment has to be set before anomaly
+            AnomalySettings.NextAnomaly();
+            
+            SceneManager.LoadScene("MainScene");
+        }
+        else
+        {
+            AnomalySettings.PastAnomalies.Clear();
+            AnomalySettings.Anomaly = null;
+            AnomalySettings.Environment = AnomalyManager.Environment.Normal;
+            
+            AnomalySettings.NextAnomaly();
+
+            SceneManager.LoadScene("MainScene");
+        }
     }
     
     private void OnTriggerEnter(Collider other)
