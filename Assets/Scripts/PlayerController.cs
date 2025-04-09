@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public float lookSensitivity = 0.15f;
     public float jumpHeight = 0.4f;
     public float gravity = -9.81f;
+    public bool shouldUpdate = true;
 
     private CharacterController _controller;
     private Vector2 _moveInput;
@@ -24,6 +25,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (!shouldUpdate)
+        {
+            return;
+        }
+        
         if (_controller.isGrounded && _verticalVelocity < 0)
         {
             _verticalVelocity = -2f;
@@ -53,7 +59,7 @@ public class PlayerController : MonoBehaviour
     
     public void OnLook(InputAction.CallbackContext ctx)
     {
-        if (Cursor.visible || Cursor.lockState != CursorLockMode.Locked || PauseMenu.Paused)
+        if (Cursor.visible || Cursor.lockState != CursorLockMode.Locked || PauseMenu.Paused || !shouldUpdate)
         {
             return;
         }

@@ -35,6 +35,13 @@ public static class AnomalySettings
             availableAnomalies.Remove(AnomalyManager.AnomalyType.LeftMannequin);
             availableAnomalies.Remove(AnomalyManager.AnomalyType.RightMannequin);
         }
+
+        if (Environment == AnomalyManager.Environment.Lidar)
+        {
+            // TwChim anomalies do not work in lidar environment
+            availableAnomalies.Remove(AnomalyManager.AnomalyType.LeftTwChim);
+            availableAnomalies.Remove(AnomalyManager.AnomalyType.RightTwChim);
+        }
         
         var randomIndex = Random.Range(0, availableAnomalies.Count);
         var anomaly = availableAnomalies.ElementAt(randomIndex);

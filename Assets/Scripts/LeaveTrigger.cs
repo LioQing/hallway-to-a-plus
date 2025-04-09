@@ -5,8 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class LeaveTrigger : MonoBehaviour
 {
+    public bool isLeft;
     public bool isCorrect;
     public TextMeshProUGUI triggerDisplay;
+    public CutsceneManager cutsceneManager;
     
     private bool _isTriggerActive;
     
@@ -23,24 +25,10 @@ public class LeaveTrigger : MonoBehaviour
         {
             return;
         }
-
-        if (isCorrect)
-        {
-            AnomalySettings.NextEnvironment(); // Environment has to be set before anomaly
-            AnomalySettings.NextAnomaly();
-            
-            SceneManager.LoadScene("MainScene");
-        }
-        else
-        {
-            AnomalySettings.PastAnomalies.Clear();
-            AnomalySettings.Anomaly = null;
-            AnomalySettings.Environment = AnomalyManager.Environment.Normal;
-            
-            AnomalySettings.NextAnomaly();
-
-            SceneManager.LoadScene("MainScene");
-        }
+        
+        cutsceneManager.OnLeave(isLeft, isCorrect);
+        
+        triggerDisplay.enabled = false;
     }
     
     private void OnTriggerEnter(Collider other)

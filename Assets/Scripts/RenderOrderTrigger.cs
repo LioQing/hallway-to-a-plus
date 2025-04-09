@@ -14,16 +14,16 @@ public class RenderOrderTrigger : MonoBehaviour
             return;
         }
 
-        currentSplatRenderer.m_RenderOrder = 2;
+        currentSplatRenderer.m_RenderOrder = 3;
         
         foreach (var splatRenderer in adjacentSplatRenderers)
         {
-            splatRenderer.m_RenderOrder = 1;
+            splatRenderer.m_RenderOrder = 2;
         }
         
         foreach (var splatRenderer in otherSplatRenderers)
         {
-            splatRenderer.m_RenderOrder = 0;
+            splatRenderer.m_RenderOrder = 1;
         }
     }
 }

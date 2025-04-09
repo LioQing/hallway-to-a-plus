@@ -1,9 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GaussianSplatting.Runtime;
+using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Video;
 using Random = UnityEngine.Random;
 
 public class AnomalyManager : MonoBehaviour
@@ -35,6 +38,10 @@ public class AnomalyManager : MonoBehaviour
         // Mannequin
         LeftMannequin,
         RightMannequin,
+        
+        // TWChim
+        LeftTwChim,
+        RightTwChim,
         
         // Wall Escape
         LeftWallEscape,
@@ -69,6 +76,10 @@ public class AnomalyManager : MonoBehaviour
     public GameObject leftMannequin;
     public GameObject rightMannequin;
     public Material mannequinDistanceFadeMaterial;
+
+    [Header("TWChim")]
+    public GameObject leftTwChim;
+    public GameObject rightTwChim;
 
     [Header("Wall Escape")]
     public GaussianSplatAsset leftWallEscapeGaussian;
@@ -235,14 +246,14 @@ public class AnomalyManager : MonoBehaviour
                 CreateGaussianAnomaly((int) Anomaly - (int) AnomalyType.RightF);
                 break;
             case AnomalyType.LeftMannequin:
-                CreateMannequin();
-                break;
             case AnomalyType.RightMannequin:
                 CreateMannequin();
                 break;
-            case AnomalyType.LeftWallEscape:
-                CreateWallEscape();
+            case AnomalyType.LeftTwChim:
+            case AnomalyType.RightTwChim:
+                CreateTwChim();
                 break;
+            case AnomalyType.LeftWallEscape:
             case AnomalyType.RightWallEscape:
                 CreateWallEscape();
                 break;
@@ -304,6 +315,26 @@ public class AnomalyManager : MonoBehaviour
         }
     }
 
+    private void CreateTwChim()
+    {
+        var isLeft = IsLeftAnomaly();
+        var twChim = isLeft ? leftTwChim : rightTwChim;
+        
+        var instantiated = Instantiate(twChim);
+
+        var twChimRenderer = instantiated.GetComponentInChildren<GaussianSplatRenderer>();
+        if (environment == Environment.DistanceFade)
+        {
+            twChimRenderer.m_CSSplatUtilities = distanceFadeSplatUtilities;
+            twChimRenderer.m_Cutouts = new[] {distanceCutout};
+        }
+        else if (environment == Environment.Torch)
+        {
+            var cutout = torch.GetComponentInChildren<GaussianCutout>();
+            twChimRenderer.m_Cutouts = new[] {cutout};
+        }
+    }
+
     private void CreateWallEscape()
     {
         var isLeft = IsLeftAnomaly();
@@ -335,6 +366,7 @@ public class AnomalyManager : MonoBehaviour
             AnomalyType.LeftRedDoor2 => true,
             AnomalyType.LeftShuffleInfographics => true,
             AnomalyType.LeftMannequin => true,
+            AnomalyType.LeftTwChim => true,
             AnomalyType.LeftWallEscape => true,
             _ => false
         };
