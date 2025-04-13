@@ -116,7 +116,7 @@ public class CutsceneManager : MonoBehaviour
             AnomalySettings.StoryLevel += 1;
             AnomalySettings.PrevTrapped = false;
 
-            SceneManager.LoadScene(AnomalySettings.StoryLevel == 5 ? "MainMenuScene" : "EnterScene"); // TODO: Change to ending
+            SceneManager.LoadScene(AnomalySettings.StoryLevel == 5 ? "EndScene" : "EnterScene");
         }
         else
         {

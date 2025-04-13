@@ -32,6 +32,10 @@ public class PlayerController : MonoBehaviour
     {
         if (!shouldUpdate)
         {
+            if (_footsteps?.isPlaying == true)
+            {
+                _footsteps.Stop();
+            }
             return;
         }
         
@@ -58,6 +62,11 @@ public class PlayerController : MonoBehaviour
         
         if (_footsteps != null)
         {
+            if (_footsteps.clip == null)
+            {
+                _footsteps.clip = footstepsWalk;
+            }
+            
             if (_controller.isGrounded && _moveInput != Vector2.zero && !_footsteps.isPlaying)
             {
                 _footsteps.time = 0f;
