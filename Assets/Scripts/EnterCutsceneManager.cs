@@ -8,8 +8,10 @@ public class EnterCutsceneManager : MonoBehaviour
 {
     public GameObject choiceUi;
     public GameObject loadingUi;
+    public GameObject changingGradeUi;
     public float loadingTime = 10.0f;
     public VideoPlayer videoPlayer;
+    public VideoPlayer videoPlayerBack;
     public VideoClip toOffice;
     public VideoClip toLeft;
     public VideoClip toRight;
@@ -42,6 +44,7 @@ public class EnterCutsceneManager : MonoBehaviour
     {
         choiceUi.SetActive(false);
         loadingUi.SetActive(true);
+        changingGradeUi.SetActive(false);
 
         if (playerController != null)
         {
@@ -79,13 +82,14 @@ public class EnterCutsceneManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         choiceUi.SetActive(false);
+        StartCoroutine(DelayedDisablePlayer(videoPlayer));
         StartCoroutine(PlayStartCutscene(_isLeft.Value));
     }
 
     private IEnumerator PlayStartCutscene(bool isLeft)
     {
-        videoPlayer.enabled = true;
-        PrepareVideo(videoPlayer, isLeft ? toLeft : toRight);
+        videoPlayerBack.enabled = true;
+        PrepareVideo(videoPlayerBack, isLeft ? toLeft : toRight);
         
         if (playerController != null)
         {
@@ -93,9 +97,9 @@ public class EnterCutsceneManager : MonoBehaviour
             playerController.transform.rotation = isLeft ? leftRotation : rightRotation;
         }
         
-        yield return PlayVideo(videoPlayer);
+        yield return PlayVideo(videoPlayerBack);
         
-        videoPlayer.enabled = false;
+        videoPlayerBack.enabled = false;
         
         if (playerController != null)
         {
@@ -123,6 +127,10 @@ public class EnterCutsceneManager : MonoBehaviour
             yield return PlayVideo(videoPlayer);
         }
         
+        changingGradeUi.SetActive(true);
+
+        yield return null;
+        
         SceneManager.LoadScene("MainScene");
     }
     
@@ -143,5 +151,12 @@ public class EnterCutsceneManager : MonoBehaviour
         {
             yield return null;
         }
+    }
+
+    private IEnumerator DelayedDisablePlayer(VideoPlayer player)
+    {
+        yield return new WaitForSeconds(0.1f);
+        
+        player.enabled = false;
     }
 }

@@ -10,6 +10,7 @@ public class PointCloud : MonoBehaviour
     
     public Mesh pointMesh;
     public float pointSize = 0.1f;
+    public Shader pointCloudShader;
     
     private Material _pointMaterial;
     private ComputeBuffer _pointBuffer;
@@ -20,7 +21,7 @@ public class PointCloud : MonoBehaviour
     
     private void Awake()
     {
-        _pointMaterial = new Material(Shader.Find("Custom/PointCloud"));
+        _pointMaterial = new Material(pointCloudShader);
         _pointMaterial.SetFloat(PointSize, pointSize);
     }
     

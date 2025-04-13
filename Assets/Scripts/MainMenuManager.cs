@@ -9,17 +9,20 @@ public class MainMenuManager : MonoBehaviour
         Cursor.visible = true;
         AnomalySettings.PastAnomalies.Clear();
         AnomalySettings.Anomaly = null;
+        AnomalySettings.StoryLevel = null;
+        AnomalySettings.PrevTrapped = false;
         AnomalySettings.Environment = AnomalyManager.Environment.Normal;
     }
 
     public void OnStart()
     {
-        if (AnomalySettings.Anomaly == null)
-        {
-            AnomalySettings.NextAnomaly();
-        }
-
-        SceneManager.LoadScene("MainScene");
+        AnomalySettings.StoryLevel = 0;
+        AnomalySettings.PrevTrapped = false;
+        AnomalySettings.Environment = AnomalyManager.Environment.Normal;
+        
+        AnomalySettings.PastAnomalies.Clear();
+        AnomalySettings.NextAnomaly();
+        SceneManager.LoadScene("EnterScene");
     }
 
     public void OnQuit()

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,9 +10,12 @@ public class PlayerController : MonoBehaviour
     public float lookSensitivity = 0.15f;
     public float jumpHeight = 0.4f;
     public float gravity = -9.81f;
+    public AudioClip footstepsWalk;
+    public AudioClip footstepsRun;
     public bool shouldUpdate = true;
 
     private CharacterController _controller;
+    [CanBeNull] private AudioSource _footsteps;
     private Vector2 _moveInput;
     private bool _jumpInput;
     private bool _isRunning;
@@ -21,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         _controller = GetComponent<CharacterController>();
+        _footsteps = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -50,6 +55,24 @@ public class PlayerController : MonoBehaviour
         move.y = _verticalVelocity;
         
         _controller.Move(move * Time.deltaTime);
+        
+        if (_footsteps != null)
+        {
+            if (_controller.isGrounded && _moveInput != Vector2.zero && !_footsteps.isPlaying)
+            {
+                _footsteps.time = 0f;
+                _footsteps.Play();
+            }
+            else if (!_controller.isGrounded || _moveInput == Vector2.zero)
+            {
+                _footsteps.Stop();
+            }
+
+            if (_footsteps.isPlaying)
+            {
+                _footsteps.clip = _isRunning ? footstepsRun : footstepsWalk;
+            }
+        }
     }
 
     public void OnMove(InputAction.CallbackContext ctx)

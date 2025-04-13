@@ -5,6 +5,7 @@ using GaussianSplatting.Runtime;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(LineRenderer))]
@@ -14,6 +15,7 @@ public class Lidar : MonoBehaviour
     public PointCloud pointCloud;
     public GameObject gaussianSplatsScene;
     public GameObject hideTriggers;
+    [CanBeNull] public ItemFollow itemFollow;
     public List<Renderer> extraCaptureRenderers = new();
     public InputActionReference captureAction;
 
@@ -26,7 +28,6 @@ public class Lidar : MonoBehaviour
     private int _currentPointIndex;
     private float _captureTimer;
     private LineRenderer _lineRenderer;
-    [CanBeNull] private ItemFollow _itemFollow;
 
     private (GaussianSplatRenderer, HideTrigger)[] _splats;
 
@@ -68,18 +69,17 @@ public class Lidar : MonoBehaviour
 
         pointCloud.CreatePoint(maxPoints);
         
-        _itemFollow = GetComponent<ItemFollow>();
-        if (_itemFollow != null)
+        if (itemFollow != null)
         {
-            _itemFollow.shouldUpdate = false;
+            itemFollow.shouldUpdate = false;
         }
     }
 
     private void LateUpdate()
     {
-        if (_itemFollow != null)
+        if (itemFollow != null)
         {
-            _itemFollow.OnUpdateRequest();
+            itemFollow.OnUpdateRequest();
         }
         
         Capture();

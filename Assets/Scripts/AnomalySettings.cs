@@ -7,6 +7,8 @@ public static class AnomalySettings
 {
     public static AnomalyManager.Environment Environment;
     public static AnomalyManager.AnomalyType? Anomaly;
+    public static int? StoryLevel;
+    public static bool PrevTrapped;
     public static HashSet<AnomalyManager.AnomalyType> PastAnomalies = new();
     
     public static void NextEnvironment()

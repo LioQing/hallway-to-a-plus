@@ -1,12 +1,14 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CustomSubmenu : MonoBehaviour
 {
     public GameObject environmentButton;
     public GameObject anomalyButton;
+    public GameObject customStartButton;
 
     public GameObject environmentList;
     public GameObject anomalyList;
@@ -25,6 +27,7 @@ public class CustomSubmenu : MonoBehaviour
     {
         environmentButton.SetActive(false);
         anomalyButton.SetActive(false);
+        customStartButton.SetActive(false);
         environmentList.SetActive(false);
         anomalyList.SetActive(false);
         
@@ -73,6 +76,19 @@ public class CustomSubmenu : MonoBehaviour
         }
     }
 
+    public void OnStart()
+    {
+        AnomalySettings.StoryLevel = null;
+        AnomalySettings.PrevTrapped = false;
+        AnomalySettings.PastAnomalies.Clear();
+        if (AnomalySettings.Anomaly == null)
+        {
+            AnomalySettings.NextAnomaly();
+        }
+        
+        SceneManager.LoadScene("MainScene");
+    }
+
     public void OnCustomMenu()
     {
         _layer = _layer == 0 ? 1 : 0;
@@ -81,11 +97,13 @@ public class CustomSubmenu : MonoBehaviour
         {
             environmentButton.SetActive(true);
             anomalyButton.SetActive(true);
+            customStartButton.SetActive(true);
         }
         else
         {
             environmentButton.SetActive(false);
             anomalyButton.SetActive(false);
+            customStartButton.SetActive(false);
             environmentList.SetActive(false);
             anomalyList.SetActive(false);
         }
