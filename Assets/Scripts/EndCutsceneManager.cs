@@ -9,27 +9,30 @@ using UnityEngine.SceneManagement;
 public class EndCutsceneManager : MonoBehaviour
 {
     public GameObject loadingUi;
+    public AudioSource music;
     public TextMeshProUGUI textUi;
     public float loadingTime = 10.0f;
 
+    public float transitionTime1;
     public Vector3 position1Start;
     public Vector3 position1End;
     public Quaternion rotation1Start;
     public Quaternion rotation1End;
+    public float transitionTime2;
     public Vector3 position2Start;
     public Vector3 position2End;
     public Quaternion rotation2Start;
     public Quaternion rotation2End;
+    public float transitionTime3;
     public Vector3 position3Start;
     public Vector3 position3End;
     public Quaternion rotation3Start;
     public Quaternion rotation3End;
+    public float transitionTime4;
     public Vector3 position4Start;
     public Vector3 position4End;
     public Quaternion rotation4Start;
     public Quaternion rotation4End;
-    
-    public float transitionTime = 8.0f;
     
     public GameObject gaussianSplatsScene;
     public GameObject torch;
@@ -54,20 +57,21 @@ public class EndCutsceneManager : MonoBehaviour
 
     private IEnumerator PlayEndCutscene()
     {
+        music.Play();
         yield return new WaitForSeconds(loadingTime);
         loadingUi.SetActive(false);
         textUi.gameObject.SetActive(true);
         
         transform.position = position1Start;
         transform.rotation = rotation1Start;
-        
+
         yield return StartCoroutine(Transition(0, position1Start, position1End, rotation1Start, rotation1End));
 
         textUi.text = "COMP3329 Group 25\n\nLio Qing - Game Design, Programming, 3D Modeling, Soundtrack\nSteven Law - Game Design, 3D Modeling";
         
         yield return StartCoroutine(Transition(1, position2Start, position2End, rotation2Start, rotation2End));
 
-        textUi.text = "Hallway to A+\n\nMade with Unity, Blender, Gaussian Splatting";
+        textUi.text = "Hallway to A+\n\nMade with\nUnity\nBlender\nGaussian Splatting\nSuno";
         
         yield return StartCoroutine(Transition(2, position3Start, position3End, rotation3Start, rotation3End));
 
@@ -81,6 +85,14 @@ public class EndCutsceneManager : MonoBehaviour
     private IEnumerator Transition(int index, Vector3 startPosition, Vector3 endPosition, Quaternion startRotation, Quaternion endRotation)
     {
         var elapsedTime = 0f;
+        var transitionTime = index switch
+        {
+            0 => transitionTime1,
+            1 => transitionTime2,
+            2 => transitionTime3,
+            3 => transitionTime4,
+            _ => throw new ArgumentOutOfRangeException(nameof(index), "Invalid index for transition time.")
+        };
 
         if (index == 0)
         {

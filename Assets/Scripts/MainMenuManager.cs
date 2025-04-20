@@ -22,7 +22,12 @@ public class MainMenuManager : MonoBehaviour
         
         AnomalySettings.PastAnomalies.Clear();
         AnomalySettings.NextAnomaly();
-        SceneManager.LoadScene("EnterScene");
+        SceneManager.LoadScene("IntroScene");
+    }
+
+    public void OnCredits()
+    {
+        SceneManager.LoadScene("EndScene");
     }
 
     public void OnQuit()
