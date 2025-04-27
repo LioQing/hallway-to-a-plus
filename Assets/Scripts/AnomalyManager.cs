@@ -41,6 +41,10 @@ public class AnomalyManager : MonoBehaviour
         // Wall Escape
         LeftWallEscape,
         RightWallEscape,
+        
+        // Shrink
+        LeftShrink,
+        RightShrink,
     }
     
     public GameObject gaussianSplatsScene;
@@ -83,6 +87,10 @@ public class AnomalyManager : MonoBehaviour
     public GameObject rightWallEscapeWalls;
     public GameObject leftWallOriginalWall;
     public GameObject rightWallOriginalWall;
+
+    [Header("Shrink")]
+    public GameObject leftShrink;
+    public GameObject rightShrink;
     
     [Header("Leave Triggers")]
     public LeaveTrigger leftLeaveTrigger;
@@ -252,6 +260,10 @@ public class AnomalyManager : MonoBehaviour
             case AnomalyType.RightWallEscape:
                 CreateWallEscape();
                 break;
+            case AnomalyType.LeftShrink:
+            case AnomalyType.RightShrink:
+                CreateShrink();
+                break;
             case null:
                 break;
             default:
@@ -343,6 +355,13 @@ public class AnomalyManager : MonoBehaviour
         Instantiate(walls);
     }
 
+    private void CreateShrink()
+    {
+        var isLeft = IsLeftAnomaly();
+        var shrink = isLeft ? leftShrink : rightShrink;
+        Instantiate(shrink);
+    }
+
     private void SetLeaveTriggers()
     {
         var isLeft = IsLeftAnomaly();
@@ -363,6 +382,7 @@ public class AnomalyManager : MonoBehaviour
             AnomalyType.LeftMannequin => true,
             AnomalyType.LeftTwChim => true,
             AnomalyType.LeftWallEscape => true,
+            AnomalyType.LeftShrink => true,
             _ => false
         };
     }

@@ -170,7 +170,7 @@ MonoBehaviour:
   m_SHOrder: 3
   m_SHOnly: 0
   m_SortNthFrame: 1
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_PointDisplaySize: 3
   m_Cutouts: []
   m_ShaderSplats: {fileID: 4800000, guid: ed800126ae8844a67aad1974ddddd59c, type: 3}
@@ -1202,7 +1202,7 @@ MonoBehaviour:
   m_SHOrder: 3
   m_SHOnly: 0
   m_SortNthFrame: 1
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_PointDisplaySize: 3
   m_Cutouts: []
   m_ShaderSplats: {fileID: 4800000, guid: ed800126ae8844a67aad1974ddddd59c, type: 3}
@@ -1696,6 +1696,8 @@ MonoBehaviour:
   rightWallEscapeWalls: {fileID: 3554838629364834985, guid: bfcf47d087ffede41a660bba783c5544, type: 3}
   leftWallOriginalWall: {fileID: 1479250058}
   rightWallOriginalWall: {fileID: 1919632324}
+  leftShrink: {fileID: 5130454144880994281, guid: 9b654f414751c1b45a24898879f44cd6, type: 3}
+  rightShrink: {fileID: 4742342254955904436, guid: 18d2b80a7659acb4bbc5148907d69841, type: 3}
   leftLeaveTrigger: {fileID: 952699671}
   rightLeaveTrigger: {fileID: 379967863}
 --- !u!4 &515532653
@@ -4917,7 +4919,7 @@ MonoBehaviour:
   m_SHOrder: 3
   m_SHOnly: 0
   m_SortNthFrame: 1
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_PointDisplaySize: 3
   m_Cutouts: []
   m_ShaderSplats: {fileID: 4800000, guid: ed800126ae8844a67aad1974ddddd59c, type: 3}
@@ -6466,7 +6468,7 @@ MonoBehaviour:
   m_SHOrder: 3
   m_SHOnly: 0
   m_SortNthFrame: 1
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_PointDisplaySize: 3
   m_Cutouts: []
   m_ShaderSplats: {fileID: 4800000, guid: ed800126ae8844a67aad1974ddddd59c, type: 3}

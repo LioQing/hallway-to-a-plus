@@ -43,6 +43,10 @@ public static class AnomalySettings
             // TwChim anomalies do not work in lidar environment
             availableAnomalies.Remove(AnomalyManager.AnomalyType.LeftTwChim);
             availableAnomalies.Remove(AnomalyManager.AnomalyType.RightTwChim);
+            
+            // Shrink anomalies do not work in lidar environment
+            availableAnomalies.Remove(AnomalyManager.AnomalyType.LeftShrink);
+            availableAnomalies.Remove(AnomalyManager.AnomalyType.RightShrink);
         }
         
         var randomIndex = Random.Range(0, availableAnomalies.Count);

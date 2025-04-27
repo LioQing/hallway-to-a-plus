@@ -12,6 +12,7 @@ public class EndCutsceneManager : MonoBehaviour
     public AudioSource music;
     public TextMeshProUGUI textUi;
     public float loadingTime = 10.0f;
+    public bool hideText;
 
     public float transitionTime1;
     public Vector3 position1Start;
@@ -60,7 +61,10 @@ public class EndCutsceneManager : MonoBehaviour
         music.Play();
         yield return new WaitForSeconds(loadingTime);
         loadingUi.SetActive(false);
-        textUi.gameObject.SetActive(true);
+        if (!hideText)
+        {
+            textUi.gameObject.SetActive(true);
+        }
         
         transform.position = position1Start;
         transform.rotation = rotation1Start;

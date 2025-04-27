@@ -129,7 +129,7 @@ public class EnterCutsceneManager : MonoBehaviour
         
         changingGradeUi.SetActive(true);
 
-        yield return null;
+        yield return new WaitForSeconds(2.0f);
         
         SceneManager.LoadScene("MainScene");
     }

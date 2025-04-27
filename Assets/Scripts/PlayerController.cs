@@ -13,7 +13,8 @@ public class PlayerController : MonoBehaviour
     public AudioClip footstepsWalk;
     public AudioClip footstepsRun;
     public bool shouldUpdate = true;
-
+    
+    private Camera _camera;
     private CharacterController _controller;
     [CanBeNull] private AudioSource _footsteps;
     private Vector2 _moveInput;
@@ -26,6 +27,7 @@ public class PlayerController : MonoBehaviour
     {
         _controller = GetComponent<CharacterController>();
         _footsteps = GetComponent<AudioSource>();
+        _camera = Camera.main;
     }
 
     private void Update()
@@ -104,7 +106,7 @@ public class PlayerController : MonoBehaviour
         _verticalRotation -= mouseDelta.y;
         _verticalRotation = Mathf.Clamp(_verticalRotation, -90f, 90f);
         
-        Camera.main!.transform.localRotation = Quaternion.Euler(_verticalRotation, 0f, 0f);
+        _camera.transform.localRotation = Quaternion.Euler(_verticalRotation, 0f, 0f);
     }
 
     public void OnJump(InputAction.CallbackContext ctx)

@@ -584,7 +584,8 @@ MonoBehaviour:
   music: {fileID: 1077399804}
   textUi: {fileID: 775335197}
   loadingTime: 8
-  transitionTime1: 13
+  hideText: 0
+  transitionTime1: 13.5
   position1Start: {x: 19.44, y: 1.3, z: -6.85}
   position1End: {x: 4.01, y: 1.3, z: -7.23}
   rotation1Start: {x: 0, y: -0.7193398, z: 0, w: 0.6946584}
